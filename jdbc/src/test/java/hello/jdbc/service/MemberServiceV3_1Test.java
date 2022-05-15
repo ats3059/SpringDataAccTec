@@ -1,14 +1,16 @@
 package hello.jdbc.service;
 
 import hello.jdbc.domain.Member;
-import hello.jdbc.reopsitory.MemberRepositoryV1;
 import hello.jdbc.reopsitory.MemberRepositoryV2;
+import hello.jdbc.reopsitory.MemberRepositoryV3;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,27 +18,25 @@ import java.sql.SQLException;
 import static hello.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 트랜잭션 커넥션 파라미터 동기화
+ *  트랜잭션 - 트랜잭션 매니저
  */
 @Slf4j
-class MemberServiceV2Test {
+class MemberServiceV3_1Test {
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
 
-    private MemberRepositoryV2 memberRepository;
-    private MemberServiceV2 memberService;
-    private Connection con;
+    private MemberRepositoryV3 memberRepository;
+    private MemberServiceV3_1 memberService;
 
     @BeforeEach
     void beforeEach() throws SQLException {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV2(dataSource);
-        memberService = new MemberServiceV2(dataSource,memberRepository);
-        con = dataSource.getConnection();
+        memberRepository = new MemberRepositoryV3(dataSource);
+        PlatformTransactionManager transactionManager = new DataSourceTransactionManager();
+        memberService = new MemberServiceV3_1(transactionManager,memberRepository);
     }
 
     @AfterEach
