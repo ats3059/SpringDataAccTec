@@ -19,6 +19,9 @@ repositories {
 }
 
 dependencies {
+	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
+
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
