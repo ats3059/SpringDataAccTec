@@ -1,43 +1,58 @@
 package hello.jdbc.service;
 
 import hello.jdbc.domain.Member;
-import hello.jdbc.reopsitory.MemberRepositoryV1;
-import hello.jdbc.reopsitory.MemberRepositoryV2;
+import hello.jdbc.reopsitory.MemberRepositoryV3;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static hello.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * 트랜잭션 커넥션 파라미터 동기화
- */
 @Slf4j
-class MemberServiceV2Test {
+@SpringBootTest
+class MemberServiceV3_3Test {
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
 
-    private MemberRepositoryV2 memberRepository;
-    private MemberServiceV2 memberService;
-    private Connection con;
+    @Autowired
+    private MemberRepositoryV3 memberRepository;
+    @Autowired
+    private MemberServiceV3_3 memberService;
 
-    @BeforeEach
-    void beforeEach() throws SQLException {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV2(dataSource);
-        memberService = new MemberServiceV2(dataSource,memberRepository);
-        con = dataSource.getConnection();
+    @TestConfiguration
+    static class TestConfig{
+        @Bean
+        DataSource dataSource(){
+            return new DriverManagerDataSource(URL, USERNAME, PASSWORD);
+        }
+        @Bean
+        PlatformTransactionManager transactionManager(){
+            return new DataSourceTransactionManager(dataSource());
+        }
+        @Bean
+        MemberRepositoryV3 memberRepositoryV3(){
+            return new MemberRepositoryV3(dataSource());
+        }
+        @Bean
+        MemberServiceV3_3 memberServiceV3_3(){
+            return new MemberServiceV3_3(memberRepositoryV3());
+        }
     }
 
     @AfterEach
