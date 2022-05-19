@@ -3,6 +3,7 @@ package hello.jdbc.service;
 import hello.jdbc.domain.Member;
 import hello.jdbc.reopsitory.MemberRepository;
 import hello.jdbc.reopsitory.MemberRepositoryV4_1;
+import hello.jdbc.reopsitory.MemberRepositoryV5;
 import hello.jdbc.reopsitory.ex.MemberRepositoryV4_2;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -45,13 +46,14 @@ class MemberServiceV4Test {
         }
 
         @Bean
-        MemberRepository memberRepositoryV4_1() {
-            return new MemberRepositoryV4_2(dataSource);
+        MemberRepository memberRepositoryV5() throws SQLException {
+
+            return new MemberRepositoryV5(dataSource);
         }
 
         @Bean
-        MemberServiceV4 memberServiceV4() {
-            return new MemberServiceV4(memberRepositoryV4_1());
+        MemberServiceV4 memberServiceV4() throws SQLException {
+            return new MemberServiceV4(memberRepositoryV5());
         }
     }
 
@@ -64,8 +66,8 @@ class MemberServiceV4Test {
     }
 
     @Test
-    void test(){
-        System.out.println(ap.getBean(MemberRepository.class).getClass().getName());
+    void test() throws SQLException {
+        System.out.println(ap.getBean(DataSource.class).getConnection().getMetaData().getDatabaseProductName());
     }
 
     @Test
